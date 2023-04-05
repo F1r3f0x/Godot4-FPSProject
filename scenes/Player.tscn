@@ -1,10 +1,16 @@
-[gd_scene load_steps=3 format=3 uid="uid://da2fr8r4am37l"]
+[gd_scene load_steps=5 format=3 uid="uid://da2fr8r4am37l"]
 
 [ext_resource type="Script" path="res://scripts/Player.gd" id="1_c6r0g"]
+[ext_resource type="AudioStream" uid="uid://j5ddxy070ep3" path="res://assets/sounds/jump.mp3" id="2_ecsi1"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_hnrkt"]
 radius = 0.4
 height = 1.75
+
+[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_sm2ot"]
+streams_count = 1
+stream_0/stream = ExtResource("2_ecsi1")
+stream_0/weight = 1.0
 
 [node name="Player" type="CharacterBody3D"]
 script = ExtResource("1_c6r0g")
@@ -17,3 +23,8 @@ shape = SubResource("CapsuleShape3D_hnrkt")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
 
 [node name="Camera" type="Camera3D" parent="Head"]
+fov = 80.0
+
+[node name="AudioPlayer3D" type="AudioStreamPlayer3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+stream = SubResource("AudioStreamRandomizer_sm2ot")
