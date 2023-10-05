@@ -1,0 +1,29 @@
+[gd_scene load_steps=5 format=3 uid="uid://bsyt7ic087q0s"]
+
+[ext_resource type="Script" path="res://scripts/MovementSeparator.gd" id="1_bqvoq"]
+
+[sub_resource type="SeparationRayShape3D" id="SeparationRayShape3D_wab6r"]
+length = 0.35
+
+[sub_resource type="SphereMesh" id="SphereMesh_lx1dy"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nx46x"]
+albedo_color = Color(1, 0, 0, 1)
+
+[node name="MovementSeparator" type="CharacterBody3D"]
+collision_mask = 2
+floor_stop_on_slope = false
+script = ExtResource("1_bqvoq")
+
+[node name="Collider" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0)
+shape = SubResource("SeparationRayShape3D_wab6r")
+
+[node name="Ball1" type="MeshInstance3D" parent="Collider"]
+transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 0)
+mesh = SubResource("SphereMesh_lx1dy")
+surface_material_override/0 = SubResource("StandardMaterial3D_nx46x")
+
+[node name="Ball2" type="MeshInstance3D" parent="Collider"]
+transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 0.5)
+mesh = SubResource("SphereMesh_lx1dy")

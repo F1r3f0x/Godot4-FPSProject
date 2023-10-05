@@ -1,0 +1,79 @@
+[gd_scene load_steps=11 format=3 uid="uid://da2fr8r4am37l"]
+
+[ext_resource type="Script" path="res://scripts/Player.gd" id="1_c6r0g"]
+[ext_resource type="AudioStream" uid="uid://j5ddxy070ep3" path="res://assets/sounds/jump.mp3" id="2_ecsi1"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_6c8fu"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_eyca7"]
+albedo_color = Color(0, 1, 0, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_jg3bs"]
+height = 1.75
+
+[sub_resource type="SeparationRayShape3D" id="SeparationRayShape3D_wab6r"]
+length = 0.5
+
+[sub_resource type="SphereMesh" id="SphereMesh_lx1dy"]
+
+[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_sm2ot"]
+streams_count = 1
+stream_0/stream = ExtResource("2_ecsi1")
+stream_0/weight = 1.0
+
+[sub_resource type="SphereMesh" id="SphereMesh_sctbd"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2td7b"]
+albedo_color = Color(1, 0, 0, 1)
+emission_enabled = true
+emission = Color(1, 0, 0, 1)
+emission_energy_multiplier = 1.44
+
+[node name="Player" type="CharacterBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+collision_mask = 3
+floor_stop_on_slope = false
+floor_snap_length = 0.55
+script = ExtResource("1_c6r0g")
+
+[node name="BodyCollision" type="CollisionShape3D" parent="."]
+shape = SubResource("CapsuleShape3D_6c8fu")
+
+[node name="DebugMesh" type="MeshInstance3D" parent="BodyCollision"]
+visible = false
+material_override = SubResource("StandardMaterial3D_eyca7")
+transparency = 0.25
+cast_shadow = 0
+mesh = SubResource("CylinderMesh_jg3bs")
+
+[node name="StairCollision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0.83, -0.5, 0)
+shape = SubResource("SeparationRayShape3D_wab6r")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="StairCollision"]
+transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 0)
+mesh = SubResource("SphereMesh_lx1dy")
+
+[node name="Head" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.23163, 2.90909)
+
+[node name="Camera" type="Camera3D" parent="Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.822198, -0.0263805)
+fov = 80.0
+
+[node name="AudioPlayer3D" type="AudioStreamPlayer3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+stream = SubResource("AudioStreamRandomizer_sm2ot")
+
+[node name="Height" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.75, 0)
+
+[node name="Legs" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+
+[node name="Node3D" type="Node3D" parent="."]
+
+[node name="DebugPoint" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, -1)
+mesh = SubResource("SphereMesh_sctbd")
+surface_material_override/0 = SubResource("StandardMaterial3D_2td7b")

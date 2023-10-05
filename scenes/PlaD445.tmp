@@ -1,8 +1,7 @@
-[gd_scene load_steps=10 format=3 uid="uid://da2fr8r4am37l"]
+[gd_scene load_steps=12 format=3 uid="uid://da2fr8r4am37l"]
 
 [ext_resource type="Script" path="res://scripts/Player.gd" id="1_c6r0g"]
 [ext_resource type="AudioStream" uid="uid://j5ddxy070ep3" path="res://assets/sounds/jump.mp3" id="2_ecsi1"]
-[ext_resource type="PackedScene" uid="uid://bsyt7ic087q0s" path="res://scenes/MovementSeparator.tscn" id="2_ly8am"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_eyca7"]
 albedo_color = Color(0, 1, 0, 1)
@@ -10,8 +9,16 @@ albedo_color = Color(0, 1, 0, 1)
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_wxany"]
 height = 1.75
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_w6mou"]
-height = 1.75
+[sub_resource type="BoxShape3D" id="BoxShape3D_isi3v"]
+size = Vector3(1, 1.75, 1)
+
+[sub_resource type="SeparationRayShape3D" id="SeparationRayShape3D_wab6r"]
+length = 0.5
+
+[sub_resource type="SphereMesh" id="SphereMesh_lx1dy"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nx46x"]
+albedo_color = Color(1, 0, 0, 1)
 
 [sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_sm2ot"]
 streams_count = 1
@@ -27,7 +34,7 @@ albedo_color = Color(1, 0, 1, 1)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 collision_mask = 2
 floor_stop_on_slope = false
-floor_snap_length = 5.0
+floor_snap_length = 0.55
 script = ExtResource("1_c6r0g")
 
 [node name="DebugMesh" type="MeshInstance3D" parent="."]
@@ -40,31 +47,43 @@ skeleton = NodePath("../BodyCollision")
 
 [node name="BodyCollision" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.125, 0)
-shape = SubResource("CapsuleShape3D_w6mou")
+shape = SubResource("BoxShape3D_isi3v")
 
-[node name="Legs" parent="." instance=ExtResource("2_ly8am")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.519533, -0.891711, 0)
+[node name="LegsCollision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, -0.5, 0)
+shape = SubResource("SeparationRayShape3D_wab6r")
+disabled = true
+
+[node name="Ball1" type="MeshInstance3D" parent="LegsCollision"]
+transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 0)
+visible = false
+mesh = SubResource("SphereMesh_lx1dy")
+surface_material_override/0 = SubResource("StandardMaterial3D_nx46x")
+
+[node name="Ball2" type="MeshInstance3D" parent="LegsCollision"]
+transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 0.5)
+mesh = SubResource("SphereMesh_lx1dy")
 
 [node name="Head" type="Marker3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 
 [node name="Camera" type="Camera3D" parent="Head"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, -0.23686, -2.06362)
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 1.24436, -2.06362)
 fov = 80.0
 
 [node name="AudioPlayer3D" type="AudioStreamPlayer3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
 stream = SubResource("AudioStreamRandomizer_sm2ot")
 
-[node name="LegMarker" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.65, 0)
+[node name="Leg" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 
-[node name="devBall" type="MeshInstance3D" parent="LegMarker"]
+[node name="devBall" type="MeshInstance3D" parent="Leg"]
 transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 0)
 mesh = SubResource("SphereMesh_og7w8")
 skeleton = NodePath("../..")
 surface_material_override/0 = SubResource("StandardMaterial3D_sxfpn")
 
-[node name="LegRay" type="RayCast3D" parent="LegMarker"]
-collision_mask = 2
+[node name="RayCast3D" type="RayCast3D" parent="Leg"]
+collision_mask = 3
 debug_shape_custom_color = Color(0, 1, 0, 1)
