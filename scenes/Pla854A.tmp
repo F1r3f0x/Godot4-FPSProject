@@ -1,73 +1,59 @@
-[gd_scene load_steps=11 format=3 uid="uid://da2fr8r4am37l"]
+[gd_scene load_steps=7 format=3 uid="uid://da2fr8r4am37l"]
 
 [ext_resource type="Script" path="res://scripts/Player.gd" id="1_c6r0g"]
 [ext_resource type="AudioStream" uid="uid://j5ddxy070ep3" path="res://assets/sounds/jump.mp3" id="2_ecsi1"]
+[ext_resource type="Shape3D" uid="uid://ccrudm5kaeuli" path="res://resources/PlayerCollider.tres" id="2_gmh4l"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qteop"]
-albedo_color = Color(0, 1, 1, 1)
+albedo_color = Color(0, 1, 0, 1)
 
-[sub_resource type="BoxMesh" id="BoxMesh_ippwq"]
-size = Vector3(1, 1.76, 1)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_30a5b"]
-albedo_color = Color(1, 0, 1, 1)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_wny8y"]
-size = Vector3(1, 1.76, 1)
+[sub_resource type="CylinderMesh" id="CylinderMesh_sjnsp"]
+height = 1.75
 
 [sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_sm2ot"]
 streams_count = 1
 stream_0/stream = ExtResource("2_ecsi1")
 stream_0/weight = 1.0
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_dvrxk"]
-size = Vector3(1, 1.76, 1)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kn6mn"]
-albedo_color = Color(0, 1, 0, 1)
-
-[sub_resource type="SphereMesh" id="SphereMesh_rvsdw"]
-
 [node name="Player" type="CharacterBody3D"]
 collision_mask = 2
 floor_stop_on_slope = false
 floor_snap_length = 0.55
 script = ExtResource("1_c6r0g")
+MAX_SPEED = null
+WALK_SPEED = null
+ACCELERATION_RATE = null
+FRICTION = null
+AIR_ACCELERATION_RATE = null
+AIR_STOP_ACCELERATION = null
+AIR_COUNTER_SCALE = null
+JUMP_FORCE = null
+AIR_CONTROL = null
+MAX_HANG = null
+MOUSE_SENSITIVITY = null
 
 [node name="DevMesh" type="MeshInstance3D" parent="."]
 material_override = SubResource("StandardMaterial3D_qteop")
 transparency = 0.25
 cast_shadow = 0
-mesh = SubResource("BoxMesh_ippwq")
-skeleton = NodePath("../BodyCollision")
-
-[node name="DevMesh2" type="MeshInstance3D" parent="."]
-material_override = SubResource("StandardMaterial3D_30a5b")
-transparency = 0.25
-cast_shadow = 0
-mesh = SubResource("BoxMesh_ippwq")
+mesh = SubResource("CylinderMesh_sjnsp")
 skeleton = NodePath("../BodyCollision")
 
 [node name="BodyCollision" type="CollisionShape3D" parent="."]
-shape = SubResource("BoxShape3D_wny8y")
+shape = ExtResource("2_gmh4l")
 
 [node name="Head" type="Marker3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.541139, 0)
 
 [node name="Camera" type="Camera3D" parent="Head"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.528243, 2.09294)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.23686, 2.45991)
 fov = 80.0
 
 [node name="AudioPlayer3D" type="AudioStreamPlayer3D" parent="."]
 stream = SubResource("AudioStreamRandomizer_sm2ot")
 
 [node name="TestCast" type="ShapeCast3D" parent="."]
-shape = SubResource("BoxShape3D_dvrxk")
+shape = ExtResource("2_gmh4l")
 target_position = Vector3(0, 0, 0)
 collision_mask = 3
 debug_shape_custom_color = Color(1, 1, 0, 1)
-
-[node name="Ball" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 0)
-material_override = SubResource("StandardMaterial3D_kn6mn")
-mesh = SubResource("SphereMesh_rvsdw")

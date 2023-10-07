@@ -1,0 +1,89 @@
+[gd_scene load_steps=11 format=3 uid="uid://da2fr8r4am37l"]
+
+[ext_resource type="Script" path="res://scripts/Player.gd" id="1_c6r0g"]
+[ext_resource type="AudioStream" uid="uid://j5ddxy070ep3" path="res://assets/sounds/jump.mp3" id="2_ecsi1"]
+[ext_resource type="Shape3D" uid="uid://bf06vm7kbinev" path="res://resources/PlayerCollision.tres" id="2_wi3ct"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qteop"]
+albedo_color = Color(0, 1, 0, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_wxany"]
+height = 1.76
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_eyca7"]
+albedo_color = Color(1, 0, 0, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_c6iw0"]
+albedo_color = Color(0, 0, 1, 1)
+
+[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_sm2ot"]
+streams_count = 1
+stream_0/stream = ExtResource("2_ecsi1")
+stream_0/weight = 1.0
+
+[sub_resource type="SphereMesh" id="SphereMesh_og7w8"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sxfpn"]
+albedo_color = Color(1, 0, 1, 1)
+
+[node name="Player" type="CharacterBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.88, 0)
+collision_mask = 2
+floor_stop_on_slope = false
+floor_snap_length = 5.0
+script = ExtResource("1_c6r0g")
+
+[node name="Dev1" type="MeshInstance3D" parent="."]
+material_override = SubResource("StandardMaterial3D_qteop")
+transparency = 0.25
+cast_shadow = 0
+mesh = SubResource("CapsuleMesh_wxany")
+skeleton = NodePath("../BodyCollision")
+
+[node name="Dev2" type="MeshInstance3D" parent="."]
+material_override = SubResource("StandardMaterial3D_eyca7")
+transparency = 0.25
+cast_shadow = 0
+mesh = SubResource("CapsuleMesh_wxany")
+skeleton = NodePath("../BodyCollision")
+
+[node name="Dev3" type="MeshInstance3D" parent="."]
+visible = false
+material_override = SubResource("StandardMaterial3D_c6iw0")
+transparency = 0.25
+cast_shadow = 0
+mesh = SubResource("CapsuleMesh_wxany")
+skeleton = NodePath("../BodyCollision")
+
+[node name="BodyCollision" type="CollisionShape3D" parent="."]
+shape = ExtResource("2_wi3ct")
+
+[node name="Head" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.541139, 0)
+
+[node name="Camera" type="Camera3D" parent="Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.23686, 2.45991)
+fov = 80.0
+
+[node name="AudioPlayer3D" type="AudioStreamPlayer3D" parent="."]
+stream = SubResource("AudioStreamRandomizer_sm2ot")
+
+[node name="devBall" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 0)
+visible = false
+mesh = SubResource("SphereMesh_og7w8")
+surface_material_override/0 = SubResource("StandardMaterial3D_sxfpn")
+
+[node name="LegMarker" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+
+[node name="LegRay" type="RayCast3D" parent="LegMarker"]
+collision_mask = 2
+debug_shape_custom_color = Color(0, 1, 0, 1)
+
+[node name="TestCast" type="ShapeCast3D" parent="."]
+shape = ExtResource("2_wi3ct")
+target_position = Vector3(0, 0, 0)
+collision_mask = 3
+
+[node name="PointHelper" type="Node3D" parent="."]

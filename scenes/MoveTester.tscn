@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://cdfp2er40gy1i"]
+
+[ext_resource type="Script" path="res://scripts/MoveTester.gd" id="1_awpqr"]
+[ext_resource type="Shape3D" uid="uid://bf06vm7kbinev" path="res://resources/PlayerCollision.tres" id="2_dm0ij"]
+
+[node name="MoveTester" type="CharacterBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.125, 1.08204)
+disable_mode = 2
+collision_mask = 3
+script = ExtResource("1_awpqr")
+
+[node name="TesterShape" type="CollisionShape3D" parent="."]
+shape = ExtResource("2_dm0ij")

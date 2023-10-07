@@ -134,6 +134,9 @@ func _input(event):
 		jump_pressed = false
 		
 	# TODO: Handle crouch
+	
+	if Input.is_action_just_pressed("dev_reset"):
+		position = Vector3.ZERO
 		
 		
 func _physics_process(delta):
@@ -148,51 +151,84 @@ func _physics_process(delta):
 	if state == GROUNDED:
 		movement_ground(delta)
 		# movement_steps(delta)
+				
 	if state == FALLING:
 		movement_air(delta)
 		
-
-	# Get wished direction
-	var wish_dir = velocity.normalized()
-
-	var test_pos = wish_dir * 0.85
-	var test_vector_down = wish_dir + (Vector3.DOWN * 1.5)
-	test_vector_down.y += 0.35
-
-	# Pos to assign to snap_ray if valid
-	var snap_pos = global_position + wish_dir
-
-	# Point for testing
-	var test_point = $LegMarker/devBall
-	test_point.position = Vector3.ZERO
-
-	var test_vector = wish_dir
-	#test_point.global_position = global_position + test_pos
-
-	test_point.global_position = global_position + test_pos
+	## Check for stairs
+	var check_step_length = 0.5
+	var minimum_step_length = 0.1
 	
-	var legs = $Legs
-
-	legs.global_position.x = test_point.global_position.x
-	legs.global_position.z = test_point.global_position.z
+	var velocity_direction = to_local(global_position + velocity.normalized())
+	velocity_direction.y = 0
 	
-	if !legs.is_on_floor():
-		legs.velocity.y = -9.8
-	else:
-		legs.velocity.y = 0
-	legs.move_and_slide()
-	print(legs.global_position.y)
-	print(global_position)
+	# Reset Shape Cast
+	$TestCast.position = Vector3.ZERO
+	$TestCast.target_position = Vector3.ZERO
 	
-	var test_coll = move_and_collide(velocity * delta, true)
-	if test_coll:
-		if test_coll.get_angle() < 1.5 and test_coll.get_angle() != 0:
-			global_position.y += legs.global_position.y
+	var up_check_vector = check_step_length * Vector3.UP
+	var hor_check_vector = velocity_direction * check_step_length
 
+	# Cast height
+	up_check_vector = check_step_length * Vector3.UP
+	$TestCast.target_position = up_check_vector
+	$TestCast.force_shapecast_update()
+
+	var height_point = up_check_vector * $TestCast.get_closest_collision_safe_fraction()
+	$TestCast.target_position = Vector3.ZERO
+
+	# Cast Horizontal
+	$TestCast.position = height_point
+	$TestCast.target_position = hor_check_vector
+	$TestCast.force_shapecast_update()
+	
+	var horizontal_point = Vector3(
+		hor_check_vector.x * $TestCast.get_closest_collision_safe_fraction(),
+		height_point.y,
+		hor_check_vector.z * $TestCast.get_closest_collision_safe_fraction()
+	)
+	
+	var step_diff = 0
+	if $TestCast.is_colliding():
+		# Get the diff betweem pos and step
+		step_diff = -((global_position.y - $TestCast.get_collision_point(0).y) + 0.88)
+		#print(step_diff)
+		var hor2_check_pos = Vector3(
+			0,
+			position.y - (0.88 +step_diff), # Sets Testcast to the height of the step
+			0
+		)
+		# Do another horizontal cast
+		$TestCast.position = hor2_check_pos
+		$TestCast.target_position = hor_check_vector
+		$TestCast.force_shapecast_update()
+		if !$TestCast.is_colliding():
+			horizontal_point = hor_check_vector
+			horizontal_point.y = position.y - (0.88 +step_diff)
+	
+	# Cast Down
+	var hor_down_check_vector = Vector3(
+		0,
+		-0.5,
+		0
+	)
+
+	$TestCast.position = horizontal_point
+	$TestCast.target_position = hor_down_check_vector
+	$TestCast.force_shapecast_update()
+
+	var cast_colliding = $TestCast.is_colliding()
+
+	var stair_position =  $TestCast.position + (hor_down_check_vector * $TestCast.get_closest_collision_safe_fraction())
+	var test_collision = move_and_collide(velocity * delta, true)
+	if test_collision:
+		var angle = rad_to_deg(test_collision.get_angle())
+		var normal = test_collision.get_normal()
+		if abs(normal.y) != 1 and (normal.y == 0 or normal.y > 0.71) and is_on_floor():
+			position.y = to_global(stair_position).y
+	
 	# All calculations are done, let godot handle collisions
 	move_and_slide()
-	
-	
 	
 	# Update debug ui
 	update_ui()
@@ -352,7 +388,7 @@ func slope_speed(y_normal : float) -> float:
 
 
 func get_wish_velocity():
-	var wish_velocity : Vector3 = (transform.basis.z * forwards_move - transform.basis.x * sideways_move)
+	var wish_velocity : Vector3 = (transform.basis.x * sideways_move - transform.basis.z * forwards_move)
 	return wish_velocity
 
 
