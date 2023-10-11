@@ -55,7 +55,6 @@ shape = SubResource("BoxShape3D_wny8y")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.541139, 0)
 
 [node name="Camera" type="Camera3D" parent="Head"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.528243, 2.09294)
 fov = 80.0
 
 [node name="AudioPlayer3D" type="AudioStreamPlayer3D" parent="."]

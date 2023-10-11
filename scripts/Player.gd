@@ -4,7 +4,6 @@ extends CharacterBody3D
 @export var ui_node: Control
 
 ### Movement const variables
-
 ## Max speed on ground. Default: 10.0 - Quake default: 32.0
 @export var MAX_SPEED : float = 10.0
 	
@@ -39,15 +38,13 @@ extends CharacterBody3D
 @export var MAX_HANG : float = 0.2
 
 ##
-var on_step: bool = false
+
+
 ###
 
 ### Crouch const variables
-
-# @export var PLAYER_HEIGHT : float = 3.6    # default: 3.6
-
-# @export var CROUCH_HEIGHT : float = 2.0    # default: 2.0
-
+@export var PLAYER_HEIGHT : float = 1.76    # default: 3.6
+@export var CROUCH_HEIGHT : float = 1.0    # default: 2.
 ###
 
 ### Camera variables
@@ -57,7 +54,6 @@ var on_step: bool = false
 ###
 
 ### State variables
-
 ## Current max movement speed
 var max_move_speed: float = 0.0
 ## Current forward direction scale. (Forwards - Backwards)
@@ -75,10 +71,11 @@ var jump_pressed: bool = false
 ## Velocity when jump has started
 var jump_initial_velocity : Vector3
 
-## Player state
+### Player state
 enum {GROUNDED, FALLING, NOCLIP}
 var state := GROUNDED
 
+### Attached Nodes
 @onready var head = $Head
 @onready var camera = $Head/Camera
 
@@ -150,83 +147,11 @@ func _physics_process(delta):
 	# Handle directional movement
 	if state == GROUNDED:
 		movement_ground(delta)
-		# movement_steps(delta)
+		stair_stepping(delta)
 				
 	if state == FALLING:
 		movement_air(delta)
 		
-	## Check for stairs
-	var check_step_length = 0.5
-	var minimum_step_length = 0.1
-	
-	var velocity_direction = to_local(global_position + velocity.normalized())
-	velocity_direction.y = 0
-	
-	# Reset Shape Cast
-	$TestCast.position = Vector3.ZERO
-	$TestCast.target_position = Vector3.ZERO
-	
-	var up_check_vector = check_step_length * Vector3.UP
-	var hor_check_vector = velocity_direction * check_step_length
-
-	# Cast height
-	up_check_vector = check_step_length * Vector3.UP
-	$TestCast.target_position = up_check_vector
-	$TestCast.force_shapecast_update()
-
-	var height_point = up_check_vector * $TestCast.get_closest_collision_safe_fraction()
-	$TestCast.target_position = Vector3.ZERO
-
-	# Cast Horizontal
-	$TestCast.position = height_point
-	$TestCast.target_position = hor_check_vector
-	$TestCast.force_shapecast_update()
-	
-	var horizontal_point = Vector3(
-		hor_check_vector.x * $TestCast.get_closest_collision_safe_fraction(),
-		height_point.y,
-		hor_check_vector.z * $TestCast.get_closest_collision_safe_fraction()
-	)
-	
-	var step_diff = 0
-	if $TestCast.is_colliding():
-		# Get the diff betweem pos and step
-		step_diff = -((global_position.y - $TestCast.get_collision_point(0).y) + 0.88)
-		#print(step_diff)
-		var hor2_check_pos = Vector3(
-			0,
-			position.y - (0.88 +step_diff), # Sets Testcast to the height of the step
-			0
-		)
-		# Do another horizontal cast
-		$TestCast.position = hor2_check_pos
-		$TestCast.target_position = hor_check_vector
-		$TestCast.force_shapecast_update()
-		if !$TestCast.is_colliding():
-			horizontal_point = hor_check_vector
-			horizontal_point.y = position.y - (0.88 +step_diff)
-	
-	# Cast Down
-	var hor_down_check_vector = Vector3(
-		0,
-		-0.5,
-		0
-	)
-
-	$TestCast.position = horizontal_point
-	$TestCast.target_position = hor_down_check_vector
-	$TestCast.force_shapecast_update()
-
-	var cast_colliding = $TestCast.is_colliding()
-
-	var stair_position =  $TestCast.position + (hor_down_check_vector * $TestCast.get_closest_collision_safe_fraction())
-	var test_collision = move_and_collide(velocity * delta, true)
-	if test_collision:
-		var angle = rad_to_deg(test_collision.get_angle())
-		var normal = test_collision.get_normal()
-		if abs(normal.y) != 1 and (normal.y == 0 or normal.y > 0.71) and is_on_floor():
-			position.y = to_global(stair_position).y
-	
 	# All calculations are done, let godot handle collisions
 	move_and_slide()
 	
@@ -390,6 +315,83 @@ func slope_speed(y_normal : float) -> float:
 func get_wish_velocity():
 	var wish_velocity : Vector3 = (transform.basis.x * sideways_move - transform.basis.z * forwards_move)
 	return wish_velocity
+	
+
+func stair_stepping(delta):
+	## Check for stairs
+	var check_step_length = 0.1
+	var minimum_step_length = 0.1
+	
+	var velocity_direction = to_local(global_position + velocity.normalized())
+	velocity_direction.y = 0
+	
+	# Reset Shape Cast
+	$TestCast.position = Vector3.ZERO
+	$TestCast.target_position = Vector3.ZERO
+	
+	var up_check_vector = check_step_length * Vector3.UP
+	var hor_check_vector = velocity_direction * check_step_length
+
+	# Cast height
+	up_check_vector = 0.5 * Vector3.UP
+	$TestCast.target_position = up_check_vector
+	$TestCast.force_shapecast_update()
+
+	var height_point = up_check_vector * $TestCast.get_closest_collision_safe_fraction()
+	$TestCast.target_position = Vector3.ZERO
+
+	# Cast Horizontal
+	$TestCast.position = height_point
+	$TestCast.target_position = hor_check_vector
+	$TestCast.force_shapecast_update()
+	
+	var horizontal_point = Vector3(
+		hor_check_vector.x * $TestCast.get_closest_collision_safe_fraction(),
+		height_point.y * $TestCast.get_closest_collision_safe_fraction(),
+		hor_check_vector.z * $TestCast.get_closest_collision_safe_fraction()
+	)
+	
+	var step_diff = 0
+	if $TestCast.is_colliding():
+		# Get the diff betweem pos and step
+		step_diff = -((global_position.y - $TestCast.get_collision_point(0).y) + 0.88)
+		var hor2_check_pos = Vector3(
+			0,
+			position.y - (0.88 + step_diff), # Sets Testcast to the height of the step
+			0
+		)
+		# Do another horizontal cast
+		$TestCast.position = hor2_check_pos
+		$TestCast.target_position = hor_check_vector
+		$TestCast.force_shapecast_update()
+		if !$TestCast.is_colliding():
+			horizontal_point = hor_check_vector
+			horizontal_point.y = (position.y - (0.88 +step_diff)) * $TestCast.get_closest_collision_safe_fraction()
+		else:
+			return
+	
+	# Cast Down
+	var hor_down_check_vector = Vector3(
+		0,
+		-0.5,
+		0
+	)
+
+	$TestCast.position = horizontal_point
+	$TestCast.target_position = hor_down_check_vector
+	$TestCast.force_shapecast_update()
+
+	var cast_colliding = $TestCast.is_colliding()
+
+	var stair_position =  $TestCast.position + (hor_down_check_vector * $TestCast.get_closest_collision_safe_fraction())
+	var test_collision = move_and_collide(velocity * delta, true)
+	if test_collision:
+		var cast_player_diff = $TestCast.global_position - global_position
+		var angle = rad_to_deg(test_collision.get_angle())
+		var normal = test_collision.get_normal()
+		print(normal, stair_position, angle)
+		if abs(normal.y) != 1 and (normal.y == 0 or normal.y > 0.71) and stair_position.y < 0.5:
+			position.y = to_global(stair_position).y
 
 
 # Placeholder code to update debug ui
