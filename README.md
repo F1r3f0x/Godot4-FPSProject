@@ -4,23 +4,31 @@ Quake *.map* file support for Godot 4.x. **For the original Godot 3.x plugin, se
 
 # Before you enable Qodot
 
-1. [Use Godot Engine .NET / mono build](https://godotengine.org/download/).
-2. [Download .NET SDK](https://dotnet.microsoft.com/en-us/download), **must be .NET SDK 7.0 or higher**.
-3. Run the .NET SDK installer, ensure it completes successfully.
-4. Go to Project > C# > Create C# Solution. Then click *Build* in the top-right corner.
+1. [Use Godot Engine .NET / mono build](https://godotengine.org/download/). **You can still use GDScript with .NET build.**
+![godot_dl](https://github.com/QodotPlugin/Qodot/assets/47726614/7a831e4b-dc85-43d5-bb70-e4369d7650da)
+2. [Download 7.0 .NET SDK](https://dotnet.microsoft.com/en-us/download) and run the 7.0 SDK installer.
+![dotnet_dl](https://github.com/QodotPlugin/Qodot/assets/47726614/18d82487-c66b-47d8-83fc-bc7322720d85)
+3. In your Godot Project, go to Project > Tools > C# > Create C# Solution.
+![csharpsol](https://github.com/QodotPlugin/Qodot/assets/47726614/6f6f71f7-0db0-4ae9-9acb-81827706675b)
+4. Build your C# scripts by pressing <kbd>Alt</kbd> + <kbd>B</kbd>, or click the square *Build* button in the top-right corner.
+![image](https://github.com/QodotPlugin/Qodot/assets/47726614/af88e7a0-a6da-43dd-bc8f-50b6877a799a)
 5. Go to Project > Project Settings > Plugins, then enable Qodot.
+
+If plugin errors appear when you enable the plugin, restart the engine first. If any plugin errors persist after a restart, please [make an issue](https://github.com/QodotPlugin/Qodot/issues/new).
+
+To bring back the "Full Build" toolbar, press <kbd>Alt</kbd> + <kbd>B</kbd> and re-select your QodotMap node.
 
 # About this version
 
-Latest Tested Engine Version: **4.0.stable.mono**
+Latest Tested Engine Version: **4.1.1.stable.mono**
 
-This is a port of Qodot to Godot 4.x. It requires the .NET build of Godot to function correctly.
+This is a port of Qodot to Godot 4.x. It requires the .NET build of Godot to import maps correctly. Games can still be exported with the standard editor/export templates.
 
-Moving forward this will be the official version of the plugin and where active development will continue.
+Unlike [Qodot-plugin](https://github.com/QodotPlugin/qodot-plugin/), this [Qodot](https://github.com/QodotPlugin/Qodot/) repository is currently the official version of the plugin and where active development continues. You can also find the plugin on Godot's Asset Library.
 
 ## Documentation
 
-Consult the [Qodot User Guide](https://qodotplugin.github.io/). Documentation may not be up to date for 4.0, but most things should be the same.
+We have official [Qodot Documentation](https://qodotplugin.github.io/). The docs are undergoing maintenance, so feel free to ask questions in [Issues](https://github.com/QodotPlugin/Qodot/issues) or the [Official Discord](https://discord.gg/c72WBuG).
 
 ## Overview
 
@@ -52,7 +60,7 @@ Qodot extends the Godot editor to import Quake *.map* files, and provides a data
 
 Assorted props by [@SunkPer](https://twitter.com/SunkPer)
 
-[![](https://raw.githubusercontent.com/Shfty/qodot-extras/master/showcase/sunkper-summer-island.gif)](https://cdn.discordapp.com/attachments/651209074930876416/659427504309796876/Project_Summer_Island_WIP_25.mp4)
+[![](https://raw.githubusercontent.com/Shfty/qodot-extras/master/showcase/sunkper-summer-island.gif)](https://cdn.app.com/attachments/651209074930876416/659427504309796876/Project_Summer_Island_WIP_25.mp4)
 
 Summer Island by [@SunkPer](https://twitter.com/SunkPer)
 
@@ -76,31 +84,27 @@ Enter the traditional level editor: Simple tools built for games like Doom, Quak
 
 [Reddit - Qodot](https://www.reddit.com/r/godot/comments/e41ldk/qodot_quake_map_file_support_for_godot/)
 
-[Godot Forums - Qodot](https://godotforums.org/discussion/21573/qodot-quake-map-file-support-for-godot)
-
 [Godot Asset Library - Qodot 3.x](https://godotengine.org/asset-library/asset/446)
-
-[Hannah's Twitter](https://twitter.com/STUDIOEMBYR)
 
 ## Credits
 
 [Josh "Shifty" Palmer](https://twitter.com/ShiftyAxel) - Original Qodot plugin
 
-[Hannah "EMBYR" Crawford](https://twitter.com/STUDIOEMBYR) - Godot 4.x & C# port & maintainance
+[Hannah "EMBYR" Crawford](https://embyr.sh/) - Godot 4.x & C# port & maintainance
+
+[Emberlynn Bland](https://github.com/deertears/) - Starting the docs & community support & maintenance
 
 [Kristian Duske](https://twitter.com/kristianduske) - For creating TrenchBroom and inspiring the creation of Qodot
 
-[Arkii](https://github.com/GoomiChan) - For example code and handy documentation of the Valve 220 format
+Arkii - For example code and handy documentation of the Valve 220 format
 
 [TheRektafire](https://github.com/TheRektafire) - For a variety of useful tidbits on the .map format
-
-[Ember](https://github.com/deertears/) - For creating the user guide
 
 [Calinou](https://github.com/Calinou) - For making Qodot work on case-sensitive systems
 
 [SunkPer](https://twitter.com/SunkPer) - For showcase screenshots
 
-[lordee](https://github.com/lordee), [DistractedMOSFET](https://github.com/distractedmosfet) and [winadam](https://github.com/winadam) - For laying the groundwork of the FGD export and entity scripting systems.
+[lordee](https://github.com/lordee), [DistractedMOSFET](https://github.com/distractedmosfet) and winadam- For laying the groundwork of the FGD export and entity scripting systems.
 
 [fossegutten](https://github.com/fossegutten) - For a typed GDScript pass
 
