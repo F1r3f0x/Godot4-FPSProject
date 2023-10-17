@@ -37,6 +37,7 @@ extends CharacterBody3D
 ## This time allows you to jump just after some drop. Defualt: 0.2
 @export var MAX_HANG : float = 0.2
 
+@export var CHECK_STEP_LENGTH: float = 0.25 
 ##
 
 
@@ -76,8 +77,9 @@ enum {GROUNDED, FALLING, NOCLIP}
 var state := GROUNDED
 
 ### Attached Nodes
-@onready var head = $Head
-@onready var camera = $Head/Camera
+var head: Marker3D
+var camera: Camera3D
+var test_cast: ShapeCast3D
 
 # Debug UI
 var position_label : Label
@@ -93,6 +95,11 @@ func _ready():
 	
 	# Maximize game window
 	#DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_MAXIMIZED)
+	
+	# Get Nodes
+	head = $Head
+	camera = $Head/Camera
+	test_cast = $TestCast
 	
 	# Initialization of debug ui nodes
 	if ui_node != null:
@@ -315,59 +322,70 @@ func slope_speed(y_normal : float) -> float:
 func get_wish_velocity():
 	var wish_velocity : Vector3 = (transform.basis.x * sideways_move - transform.basis.z * forwards_move)
 	return wish_velocity
-	
 
+
+# Function to check and move through steps
 func stair_stepping(delta):
-	## Check for stairs
-	var check_step_length = 0.1
-	var minimum_step_length = 0.1
 	
+	# Get direction in global pos
 	var velocity_direction = to_local(global_position + velocity.normalized())
 	velocity_direction.y = 0
 	
 	# Reset Shape Cast
-	$TestCast.position = Vector3.ZERO
-	$TestCast.target_position = Vector3.ZERO
+	test_cast.position = Vector3.ZERO
+	test_cast.target_position = Vector3.ZERO
 	
-	var up_check_vector = check_step_length * Vector3.UP
-	var hor_check_vector = velocity_direction * check_step_length
+	# Vector to check up
+	var up_check_vector = CHECK_STEP_LENGTH * Vector3.UP
+	
+	# Vector to check hor
+	var hor_check_vector = velocity_direction * CHECK_STEP_LENGTH
 
 	# Cast height
 	up_check_vector = 0.5 * Vector3.UP
-	$TestCast.target_position = up_check_vector
-	$TestCast.force_shapecast_update()
+	test_cast.target_position = up_check_vector
+	test_cast.force_shapecast_update()
 
-	var height_point = up_check_vector * $TestCast.get_closest_collision_safe_fraction()
-	$TestCast.target_position = Vector3.ZERO
-
-	# Cast Horizontal
-	$TestCast.position = height_point
-	$TestCast.target_position = hor_check_vector
-	$TestCast.force_shapecast_update()
+	# Get the last point before colliding
+	var height_point = up_check_vector * test_cast.get_closest_collision_safe_fraction()
 	
+	# Reset cast target pos
+	test_cast.target_position = Vector3.ZERO
+
+	# Cast Horizontal (from the height point)
+	test_cast.position = height_point
+	test_cast.target_position = hor_check_vector
+	test_cast.force_shapecast_update()
+	
+	# Get the last point before colliding horizontally (from the height point)
 	var horizontal_point = Vector3(
-		hor_check_vector.x * $TestCast.get_closest_collision_safe_fraction(),
-		height_point.y * $TestCast.get_closest_collision_safe_fraction(),
-		hor_check_vector.z * $TestCast.get_closest_collision_safe_fraction()
+		hor_check_vector.x * test_cast.get_closest_collision_safe_fraction(),
+		height_point.y * test_cast.get_closest_collision_safe_fraction(),
+		hor_check_vector.z * test_cast.get_closest_collision_safe_fraction()
 	)
-	
-	var step_diff = 0
-	if $TestCast.is_colliding():
-		# Get the diff betweem pos and step
-		step_diff = -((global_position.y - $TestCast.get_collision_point(0).y) + 0.88)
+
+	# If we are colliding horizontally, do another cast to check if we can get between the ceiling and the step or floor.
+	if test_cast.is_colliding():
+		
+		# Get the height diff between pos and ceiling
+		var step_diff = -((global_position.y - test_cast.get_collision_point(0).y) + 0.88)
 		var hor2_check_pos = Vector3(
 			0,
 			position.y - (0.88 + step_diff), # Sets Testcast to the height of the step
 			0
 		)
-		# Do another horizontal cast
-		$TestCast.position = hor2_check_pos
-		$TestCast.target_position = hor_check_vector
-		$TestCast.force_shapecast_update()
-		if !$TestCast.is_colliding():
+		
+		# Do another horizontal cast to check if we have space to move
+		test_cast.position = hor2_check_pos
+		test_cast.target_position = hor_check_vector
+		test_cast.force_shapecast_update()
+		
+		# if we have the space, we teleport to the step height
+		if !test_cast.is_colliding():
 			horizontal_point = hor_check_vector
-			horizontal_point.y = (position.y - (0.88 +step_diff)) * $TestCast.get_closest_collision_safe_fraction()
+			horizontal_point.y = (position.y - (0.88 +step_diff)) * test_cast.get_closest_collision_safe_fraction()
 		else:
+			# We don't have space, return and avoid clipping through colliders
 			return
 	
 	# Cast Down
@@ -377,19 +395,21 @@ func stair_stepping(delta):
 		0
 	)
 
-	$TestCast.position = horizontal_point
-	$TestCast.target_position = hor_down_check_vector
-	$TestCast.force_shapecast_update()
+	# Cast down from the horizontal check point.
+	test_cast.position = horizontal_point
+	test_cast.target_position = hor_down_check_vector
+	test_cast.force_shapecast_update()
 
-	var cast_colliding = $TestCast.is_colliding()
-
-	var stair_position =  $TestCast.position + (hor_down_check_vector * $TestCast.get_closest_collision_safe_fraction())
+	# Get the position of the possible step next to the player.
+	var stair_position =  test_cast.position + (hor_down_check_vector * test_cast.get_closest_collision_safe_fraction())
+	
+	# Test movement
 	var test_collision = move_and_collide(velocity * delta, true)
+	
+	# If we are colliding check if we hit a valid step, and teleport to the step height.
 	if test_collision:
-		var cast_player_diff = $TestCast.global_position - global_position
-		var angle = rad_to_deg(test_collision.get_angle())
+		var cast_player_diff = test_cast.global_position - global_position
 		var normal = test_collision.get_normal()
-		print(normal, stair_position, angle)
 		if abs(normal.y) != 1 and (normal.y == 0 or normal.y > 0.71) and stair_position.y < 0.5:
 			position.y = to_global(stair_position).y
 
