@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://driqw88f1gxhi"
-path.s3tc="res://.godot/imported/clip.png-5fc9a9edc976377600ca7c1c2d5af40b.s3tc.ctex"
+path.s3tc="res://.godot/imported/clip.png-b6d457c3cfe4049ab8192995eb60d812.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://addons/qodot/textures/special/clip.png"
-dest_files=["res://.godot/imported/clip.png-5fc9a9edc976377600ca7c1c2d5af40b.s3tc.ctex"]
+source_file="res://assets/textures/qodot/special/clip.png"
+dest_files=["res://.godot/imported/clip.png-b6d457c3cfe4049ab8192995eb60d812.s3tc.ctex"]
 
 [params]
 
