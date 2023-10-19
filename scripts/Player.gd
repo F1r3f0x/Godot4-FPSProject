@@ -41,11 +41,9 @@ extends CharacterBody3D
 ##
 
 
-###
-
 ### Crouch const variables
 @export var PLAYER_HEIGHT : float = 1.76    # default: 3.6
-@export var CROUCH_HEIGHT : float = 1.0    # default: 2.
+@export var CROUCH_HEIGHT : float = 0.8    # default: 2.
 ###
 
 ### State variables
@@ -66,14 +64,15 @@ var jump_pressed: bool = false
 ## Velocity when jump has started
 var jump_initial_velocity : Vector3
 
+var is_crouching: bool = false
+
 ### Player state
 enum {GROUNDED, FALLING, NOCLIP}
 var state := GROUNDED
 
 ### Attached Nodes
-var head: Marker3D
-var camera: Camera3D
 var test_cast: ShapeCast3D
+var collider: CollisionShape3D
 
 # Debug UI
 var position_label : Label
@@ -92,6 +91,7 @@ func _ready():
 	
 	# Get Nodes
 	test_cast = $TestCast
+	collider = $BodyCollision
 	
 	# Initialization of debug ui nodes
 	if ui_node != null:
@@ -128,7 +128,12 @@ func _input(event):
 	elif Input.is_action_just_released("jump"):
 		jump_pressed = false
 		
-	# TODO: Handle crouch
+	
+	if Input.is_action_pressed("crouch"):
+		is_crouching = true
+	else:
+		is_crouching = false
+		
 	
 	if Input.is_action_just_pressed("dev_reset"):
 		position = Vector3.ZERO
@@ -141,6 +146,10 @@ func _physics_process(delta):
 	
 	# Handle jump movement
 	movement_jump(delta)
+	
+	# Handle Crouch
+	crouch(delta)
+	
 	
 	# Handle directional movement
 	if state == GROUNDED:
@@ -403,6 +412,15 @@ func stair_stepping(delta):
 		var normal = test_collision.get_normal()
 		if abs(normal.y) != 1 and (normal.y == 0 or normal.y > 0.71) and stair_position.y < 0.5:
 			position.y = to_global(stair_position).y
+			
+
+func crouch(delta):
+	var shape: BoxShape3D = collider.shape
+	if is_crouching:
+		shape.size.y = CROUCH_HEIGHT
+	else:
+		shape.size.y = PLAYER_HEIGHT
+		
 
 
 # Placeholder code to update debug ui
