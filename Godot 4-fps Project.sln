@@ -1,6 +1,6 @@
 ﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Godot 4-fps Project", "Godot 4-fps Project.csproj", "{8F3E8FF1-4858-4845-B0B3-E74EFA233B30}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Godot 4-fps Project", "Godot 4-fps Project.csproj", "{A69CD91E-72C9-469F-9BA2-7DB97EE230F7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -9,11 +9,11 @@ Global
 	ExportRelease|Any CPU = ExportRelease|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{8F3E8FF1-4858-4845-B0B3-E74EFA233B30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8F3E8FF1-4858-4845-B0B3-E74EFA233B30}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8F3E8FF1-4858-4845-B0B3-E74EFA233B30}.ExportDebug|Any CPU.ActiveCfg = ExportDebug|Any CPU
-		{8F3E8FF1-4858-4845-B0B3-E74EFA233B30}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
-		{8F3E8FF1-4858-4845-B0B3-E74EFA233B30}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
-		{8F3E8FF1-4858-4845-B0B3-E74EFA233B30}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
+		{A69CD91E-72C9-469F-9BA2-7DB97EE230F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A69CD91E-72C9-469F-9BA2-7DB97EE230F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A69CD91E-72C9-469F-9BA2-7DB97EE230F7}.ExportDebug|Any CPU.ActiveCfg = ExportDebug|Any CPU
+		{A69CD91E-72C9-469F-9BA2-7DB97EE230F7}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
+		{A69CD91E-72C9-469F-9BA2-7DB97EE230F7}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
+		{A69CD91E-72C9-469F-9BA2-7DB97EE230F7}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
 	EndGlobalSection
 EndGlobal

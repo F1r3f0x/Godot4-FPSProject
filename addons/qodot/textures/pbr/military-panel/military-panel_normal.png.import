@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://b3g5hqkvp4mqv"
-path.s3tc="res://.godot/imported/military-panel_normal.png-046b013253551383c4ccad5013e065d5.s3tc.ctex"
+path.s3tc="res://.godot/imported/military-panel_normal.png-b41ab06f25bef2d85ab94cb98383c916.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://assets/textures/qodot/pbr/military-panel/military-panel_normal.png"
-dest_files=["res://.godot/imported/military-panel_normal.png-046b013253551383c4ccad5013e065d5.s3tc.ctex"]
+source_file="res://assets/textures/pbr/military-panel/military-panel_normal.png"
+dest_files=["res://.godot/imported/military-panel_normal.png-b41ab06f25bef2d85ab94cb98383c916.s3tc.ctex"]
 
 [params]
 

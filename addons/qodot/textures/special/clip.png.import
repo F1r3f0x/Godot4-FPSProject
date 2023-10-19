@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://driqw88f1gxhi"
-path.s3tc="res://.godot/imported/clip.png-b6d457c3cfe4049ab8192995eb60d812.s3tc.ctex"
+path.s3tc="res://.godot/imported/clip.png-a7cac77780ceed0fee935df52a43ee26.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://assets/textures/qodot/special/clip.png"
-dest_files=["res://.godot/imported/clip.png-b6d457c3cfe4049ab8192995eb60d812.s3tc.ctex"]
+source_file="res://assets/textures/special/clip.png"
+dest_files=["res://.godot/imported/clip.png-a7cac77780ceed0fee935df52a43ee26.s3tc.ctex"]
 
 [params]
 

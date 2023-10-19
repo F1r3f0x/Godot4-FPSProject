@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://driqw88f1gxhi"
-path.s3tc="res://.godot/imported/tangent-test.png-017d08a8b32e8cacaff7e309c792f7cb.s3tc.ctex"
+path.s3tc="res://.godot/imported/tangent-test.png-21f614e1eaa41dc0ff40fb4d446cebfd.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://assets/textures/qodot/shaders/tangent-test.png"
-dest_files=["res://.godot/imported/tangent-test.png-017d08a8b32e8cacaff7e309c792f7cb.s3tc.ctex"]
+source_file="res://assets/textures/shaders/tangent-test.png"
+dest_files=["res://.godot/imported/tangent-test.png-21f614e1eaa41dc0ff40fb4d446cebfd.s3tc.ctex"]
 
 [params]
 

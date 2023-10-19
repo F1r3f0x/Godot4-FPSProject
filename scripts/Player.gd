@@ -37,7 +37,7 @@ extends CharacterBody3D
 ## This time allows you to jump just after some drop. Defualt: 0.2
 @export var MAX_HANG : float = 0.2
 
-@export var CHECK_STEP_LENGTH: float = 0.25 
+@export var CHECK_STEP_LENGTH: float = 0.15
 ##
 
 
@@ -46,12 +46,6 @@ extends CharacterBody3D
 ### Crouch const variables
 @export var PLAYER_HEIGHT : float = 1.76    # default: 3.6
 @export var CROUCH_HEIGHT : float = 1.0    # default: 2.
-###
-
-### Camera variables
-
-## Mouse sensitivity scale factor, bigger is slower. Default: 0.009
-@export var MOUSE_SENSITIVITY : float = 1000
 ###
 
 ### State variables
@@ -97,8 +91,6 @@ func _ready():
 	#DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_MAXIMIZED)
 	
 	# Get Nodes
-	head = $Head
-	camera = $Head/Camera
 	test_cast = $TestCast
 	
 	# Initialization of debug ui nodes
@@ -109,17 +101,16 @@ func _ready():
 		air_acceleration_label = ui_node.get_node('AirAcceleration')
 		impact_velocity_label = ui_node.get_node('ImpactVelocity')
 		
-		
 	
 func _input(event):
 	# Handle Mouse input
-	if event is InputEventMouseMotion:
+	#if event is InputEventMouseMotion:
 		# Rotate BODY horizontally, use the relative mouse movement
-		rotation.y -= event.relative.x * 1/MOUSE_SENSITIVITY
+		#rotation.y -= event.relative.x * 1/MOUSE_SENSITIVITY
 		# Rotate camera verticaly, use the relative mouse movement
-		camera.rotation.x -= event.relative.y * 1/MOUSE_SENSITIVITY
+		#camera.rotation.x -= event.relative.y * 1/MOUSE_SENSITIVITY
 		# Clamp the vertical rotation to 90°, rotation uses radians
-		camera.rotation.x = clamp(camera.rotation.x, deg_to_rad(-90), deg_to_rad(90))
+		#camera.rotation.x = clamp(camera.rotation.x, deg_to_rad(-90), deg_to_rad(90))
 	
 	# Get forward move scale, this is used to create a wished direction for the player
 	forwards_move = Input.get_action_strength("move_forward") - Input.get_action_strength("move_backwards")
