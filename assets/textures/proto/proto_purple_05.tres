@@ -1,0 +1,8 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://bok3aup87dg0t"]
+
+[ext_resource type="Texture2D" uid="uid://cf5f17476a0h7" path="res://assets/textures/proto/proto_purple_05.png" id="1_xpsrb"]
+
+[resource]
+albedo_texture = ExtResource("1_xpsrb")
+metallic_specular = 0.0
+texture_filter = 2

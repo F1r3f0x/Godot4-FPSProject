@@ -12,7 +12,7 @@ config_version=5
 
 config/name="Godot 4 - FPS Project"
 run/main_scene="res://scenes/Level.tscn"
-config/features=PackedStringArray("4.1", "C#", "Forward Plus")
+config/features=PackedStringArray("4.2", "Forward Plus")
 config/icon="res://icon.svg"
 
 [display]
@@ -25,7 +25,7 @@ project/assembly_name="Godot 4-fps Project"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/qodot/plugin.cfg")
+enabled=PackedStringArray("res://addons/func_godot/plugin.cfg")
 
 [input]
 
@@ -100,3 +100,7 @@ dev_reset={
 
 3d_physics/layer_1="Player"
 3d_physics/layer_2="Map"
+
+[rendering]
+
+occlusion_culling/use_occlusion_culling=true
