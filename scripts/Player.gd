@@ -5,10 +5,16 @@ extends CharacterBody3D
 
 ### Movement const variables
 ## Max speed on ground. Quake default: 32.0
-@export var MAX_SPEED : float = 10.0
+@export var MAX_SPEED : float = 9.0
+
+@export var FORWARD_SPEED: float = 10.0
+
+@export var SIDEWAYS_SPEED: float = 12.0
+
+@export var BACK_SPEED:	float = 10.0
 
 ## Speed when walking. Quake default: 16.0
-@export var WALK_SPEED : float = 4.0
+@export var WALK_SPEED : float = 5.0
 
 ## Player gravity. Quake default 80.0
 @export var GRAVITY : float = ProjectSettings.get_setting("physics/3d/default_gravity")
@@ -18,6 +24,8 @@ extends CharacterBody3D
 
 ## Ground movement friction. Default: 4.0 - Quake default: 6.0 (This is calculated differently)
 @export var FRICTION : float = 4.0
+
+@export var MAX_AIR_SPEED : float = 1.0
 
 ## This is applied when moving in the air. Quake default: 0.7
 @export var AIR_ACCELERATION_RATE : float = 0.7
@@ -110,9 +118,9 @@ func _ready():
 func _input(event):
 
 	# Get forward move scale, this is used to create a wished direction for the player
-	forwards_move = Input.get_action_strength("move_forward") - Input.get_action_strength("move_backwards")
+	forwards_move = Input.get_action_strength("move_forward") * FORWARD_SPEED - Input.get_action_strength("move_backwards") * BACK_SPEED
 	# Get sideways move scale, this is also a factor for the wished direction
-	sideways_move = Input.get_action_strength("strafe_right") - Input.get_action_strength("strafe_left")
+	sideways_move = (Input.get_action_strength("strafe_right") - Input.get_action_strength("strafe_left")) * SIDEWAYS_SPEED
 
 	# Set max current speed
 	max_move_speed = MAX_SPEED
@@ -218,27 +226,38 @@ func movement_jump(delta):
 func movement_ground(delta):
 	var wish_velocity : Vector3 = get_wish_velocity()
 	var wish_direction : Vector3 = wish_velocity.normalized()
-	var wish_speed : float = wish_direction.length()
+	var wish_speed : float = wish_velocity.length()
 
-	ground_accelerate(wish_direction, slope_speed(ground_normal.y), delta)
+	if wish_speed > MAX_SPEED:
+		wish_velocity *= MAX_SPEED / wish_speed
+		wish_speed = MAX_SPEED
+
+	ground_accelerate(wish_direction, wish_speed, delta)
+	ground_friction(delta)
 
 
 func ground_accelerate(wish_direction : Vector3, wish_speed : float, delta : float):
-	var friction_weight : float
-	var target_velocity : Vector3
+	var current_speed := velocity.dot(wish_direction)
 
-	if wish_direction != Vector3.ZERO:
-		friction_weight = ACCELERATION_RATE * delta
-		target_velocity = wish_direction * wish_speed
-	else:
-		friction_weight = FRICTION * delta
-		target_velocity = Vector3.ZERO
+	var add_speed = wish_speed - current_speed
+	if add_speed <= 0.0:
+		return
 
-	if friction_weight > 1:
-			friction_weight = 1
+	var acceleration_speed = ACCELERATION_RATE * delta * wish_speed
+	if acceleration_speed > add_speed:
+		acceleration_speed = add_speed
+	
+	velocity += acceleration_speed * wish_direction
 
-	velocity = velocity.lerp(target_velocity, friction_weight)
 
+func ground_friction(delta : float):
+	
+	if velocity.length() < 1.0:
+		velocity = Vector3.ZERO
+
+	# TODO: Add more friction on dropoff
+
+	velocity = velocity.lerp(Vector3.ZERO, delta * FRICTION)
 
 
 func movement_air(delta):
@@ -273,7 +292,10 @@ func movement_air(delta):
 
 
 func air_accelerate(wish_direction : Vector3, acceleration : float, delta : float):
-	var wish_speed := slope_speed(ground_normal.y)
+	var wish_speed = get_wish_velocity().length()
+	
+	if wish_speed > MAX_AIR_SPEED:
+		wish_speed = MAX_AIR_SPEED
 
 	# Quake air acceleration bug.
 	# Instead of getting the real current speed, we substract the dot product between velocity and the wished direction
@@ -291,23 +313,7 @@ func air_accelerate(wish_direction : Vector3, acceleration : float, delta : floa
 
 
 func air_control(wish_direction: Vector3, delta : float):
-	if forwards_move == 0.0:
-		return
-
-	var original_y = velocity.y
-	var speed = velocity.length()
-	velocity = velocity.normalized()
-
-	# Change direction while slowing down
-	var dot = velocity.dot(wish_direction)
-	print(dot)
-	if dot > 0.0 :
-		velocity = velocity * speed + wish_direction * AIR_CONTROL
-		velocity = velocity.normalized()
-
-	velocity.x *= speed
-	velocity.y = original_y
-	velocity.z *= speed
+	pass
 
 # Change velocity while moving up/down sloped ground
 func slope_speed(y_normal : float) -> float:
