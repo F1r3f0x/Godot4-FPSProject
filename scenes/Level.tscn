@@ -1351,14 +1351,15 @@ points = PackedVector3Array(37, 1, 111, 37, 0, 111, 38, 0, 111, 38, 1, 111, 37, 
 script = ExtResource("1_ckl1k")
 
 [node name="PlayerCamera" type="Camera3D" parent="." node_paths=PackedStringArray("player")]
-transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -13.4625, 1.58999, 83.6318)
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 3.2351, 2.0459, 45.1726)
 cull_mask = 524287
 script = ExtResource("19_b0sye")
 player = NodePath("../PlayerController")
 
 [node name="PlayerController" parent="." node_paths=PackedStringArray("ui_node") instance=ExtResource("18_q1xir")]
-transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -13.4505, 0.869987, 83.6376)
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 3.2471, 1.3259, 45.1784)
 ui_node = NodePath("../UserInterface/DebugUI")
+AIR_ACCELERATION_RATE = 0.25
 
 [node name="Light" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.692535, -0.648357, -0.316274, -0.383819, -0.702387, 0.599447, -0.610802, -0.293746, -0.735279, 0, 6, 0)
@@ -1402,6 +1403,9 @@ layout_mode = 2
 text = "bingus"
 
 [node name="ImpactVelocity" type="Label" parent="UserInterface/DebugUI"]
+layout_mode = 2
+
+[node name="SlopeNormal" type="Label" parent="UserInterface/DebugUI"]
 layout_mode = 2
 
 [node name="Crosshair" type="ColorRect" parent="UserInterface"]

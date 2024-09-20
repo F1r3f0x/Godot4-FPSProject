@@ -23,12 +23,12 @@ extends CharacterBody3D
 @export var ACCELERATION_RATE : float = 10.0
 
 ## Ground movement friction. Default: 4.0 - Quake default: 6.0 (This is calculated differently)
-@export var FRICTION : float = 4.0
+@export var FRICTION : float = 6.5
 
-@export var MAX_AIR_SPEED : float = 1.0
+@export var MAX_AIR_SPEED : float = 7.0
 
 ## This is applied when moving in the air. Quake default: 0.7
-@export var AIR_ACCELERATION_RATE : float = 0.7
+@export var AIR_ACCELERATION_RATE : float = 0.125
 
 ## This acceleration applies when you stop pressing your movement keys. Quake default: 10.0
 @export var AIR_STOP_ACCELERATION : float = 4.0
@@ -90,10 +90,13 @@ var collider: CollisionShape3D
 # Debug UI
 var position_label : Label
 var velocity_label : Label
+var input_label : Label
 var speed_label : Label
 var air_acceleration_label : Label
 var debug_air_acceleration : float = 0.0
 var impact_velocity_label: Label
+var slope_label: Label
+
 
 func _ready():
 	# Capture mouse in game window
@@ -110,9 +113,11 @@ func _ready():
 	if ui_node != null:
 		position_label = ui_node.get_node('Position')
 		velocity_label = ui_node.get_node('Velocity')
+		input_label = ui_node.get_node('InputKeys')
 		speed_label = ui_node.get_node('Speed')
 		air_acceleration_label = ui_node.get_node('AirAcceleration')
 		impact_velocity_label = ui_node.get_node('ImpactVelocity')
+		slope_label = ui_node.get_node('SlopeNormal')
 
 
 func _input(event):
@@ -153,16 +158,22 @@ func _physics_process(delta):
 	movement_jump(delta)
 
 	# Handle Crouch
-	crouch(delta)
+	#crouch(delta)
 
 	# Handle directional movement
+	var wish_velocity : Vector3 = get_wish_velocity()
+	var wish_speed : float = wish_velocity.length()
+	var wish_direction : Vector3 = wish_velocity.normalized()
+
 	if state == GROUNDED:
-		movement_ground(delta)
-		stair_stepping(delta)
+		movement_ground(wish_velocity, wish_speed, wish_direction, delta)
+		
+		if velocity.length() > 1:
+			stair_stepping(delta)
 
 	if state == FALLING:
-		movement_air(delta)
-
+		movement_air(wish_velocity, wish_speed, wish_direction, delta)
+	
 	# All calculations are done, let godot handle collisions
 	move_and_slide()
 	
@@ -223,10 +234,7 @@ func movement_jump(delta):
 
 
 ## Handles player movement on the ground
-func movement_ground(delta):
-	var wish_velocity : Vector3 = get_wish_velocity()
-	var wish_direction : Vector3 = wish_velocity.normalized()
-	var wish_speed : float = wish_velocity.length()
+func movement_ground(wish_velocity : Vector3, wish_speed : float, wish_direction : Vector3, delta):
 
 	if wish_speed > MAX_SPEED:
 		wish_velocity *= MAX_SPEED / wish_speed
@@ -251,39 +259,41 @@ func ground_accelerate(wish_direction : Vector3, wish_speed : float, delta : flo
 
 
 func ground_friction(delta : float):
-	
+
+	# Stop if not moving, or moving too slow
 	if velocity.length() < 1.0:
 		velocity = Vector3.ZERO
 
-	# TODO: Add more friction on dropoff
+	#TODO: Add more friction close to an steep edge
 
 	velocity = velocity.lerp(Vector3.ZERO, delta * FRICTION)
 
 
-func movement_air(delta):
-	var wish_direction : Vector3 = get_wish_velocity()
+func movement_air(wish_velocity : Vector3, wish_speed : float, wish_direction : Vector3, delta):
+
 	var velocity_normalized = velocity.normalized()
 	var acceleration : float
 
 	# Apply stop speed if pressing the inverse direction
-	if velocity_normalized.dot(wish_direction) < 0:
+	if velocity_normalized.dot(wish_direction) < 0.0:
 		acceleration = AIR_STOP_ACCELERATION
 	# Apply air acceleration if pressing going in a single direction, you also go diagonally
 	else:
 		acceleration = AIR_ACCELERATION_RATE
 
+	# If Current Velocity is going in the inverse direction after jump, stop accelerating so we don't move backwards on the air.
 	var counter_scale = velocity_normalized.dot(jump_initial_velocity)
-	if counter_scale < -0.5:
-		acceleration = 0
+	if counter_scale < 0.0:
+		acceleration = 0.0
 
 	debug_air_acceleration = acceleration
 
-	air_accelerate(wish_direction, acceleration, delta)
+	air_accelerate(wish_velocity, wish_speed, wish_direction, acceleration, delta)
 
 	# Air Control
 	if state == FALLING:
 		if AIR_CONTROL > 0.0:
-			air_control(wish_direction, delta)
+			air_control(wish_velocity, delta)
 
 	# Add gravity
 	velocity.y -= GRAVITY * delta
@@ -291,8 +301,7 @@ func movement_air(delta):
 	impact_velocity = abs(int(round(velocity.y)))
 
 
-func air_accelerate(wish_direction : Vector3, acceleration : float, delta : float):
-	var wish_speed = get_wish_velocity().length()
+func air_accelerate(wish_velocity : Vector3, wish_speed : float, wish_direction : Vector3, acceleration : float, delta : float):
 	
 	if wish_speed > MAX_AIR_SPEED:
 		wish_speed = MAX_AIR_SPEED
@@ -324,7 +333,7 @@ func slope_speed(y_normal : float) -> float:
 	return max_move_speed
 
 
-func get_wish_velocity():
+func get_wish_velocity() -> Vector3:
 	var wish_velocity : Vector3 = (transform.basis.x * sideways_move - transform.basis.z * forwards_move)
 	return wish_velocity
 
@@ -386,7 +395,7 @@ func stair_stepping(delta):
 		# if we have the space, we teleport to the step height
 		if !test_cast.is_colliding():
 			horizontal_point = hor_check_vector
-			horizontal_point.y = (position.y - (PLAYER_HALF_HEIGHT +step_diff)) * test_cast.get_closest_collision_safe_fraction()
+			horizontal_point.y = (position.y - (PLAYER_HALF_HEIGHT + step_diff)) * test_cast.get_closest_collision_safe_fraction()
 		else:
 			# We don't have space, return and avoid clipping through colliders
 			return
@@ -407,13 +416,14 @@ func stair_stepping(delta):
 	var stair_position =  test_cast.position + (hor_down_check_vector * test_cast.get_closest_collision_safe_fraction())
 
 	# Test movement
-	var test_collision = move_and_collide(velocity * delta, true)
+	var test_collision := move_and_collide(velocity * delta, true)
 
 	# If we are colliding check if we hit a valid step, and teleport to the step height.
 	if test_collision:
 		var cast_player_diff = test_cast.global_position - global_position
 		var normal = test_collision.get_normal()
 		ground_normal = normal
+		print(normal.y)
 		if abs(normal.y) != 1 and (normal.y == 0 or normal.y > MAX_STAIR_STEP_NORMAL) and stair_position.y < VER_CHECK_STEP_LENGTH:
 			position.y = to_global(stair_position).y
 
@@ -426,7 +436,6 @@ func crouch(delta):
 		shape.size.y = PLAYER_HEIGHT
 
 
-
 # Placeholder code to update debug ui
 func update_ui():
 	if ui_node == null:
@@ -435,6 +444,10 @@ func update_ui():
 	# Update labels
 	position_label.text = 'Position: %s' % global_position
 	velocity_label.text = 'Velocity: %s' % velocity
+	
+	var input_keys = 'forwards_move: %s sideways_move:%s' % [forwards_move, sideways_move]
+	input_label.text = input_keys
+	
 	speed_label.text = 'Horizontal SPEED: %s m/s' % Vector2(velocity.x, velocity.z).length()
 	air_acceleration_label.text = 'Air Acceleration: %s' % debug_air_acceleration
 	if debug_air_acceleration == 0:
@@ -442,3 +455,5 @@ func update_ui():
 	else:
 		air_acceleration_label.self_modulate = Color(0,255,0)
 	impact_velocity_label.text = 'Impact Velocity: %s' % impact_velocity
+	
+	slope_label.text = str(ground_normal)
